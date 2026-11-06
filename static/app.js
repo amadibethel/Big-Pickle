@@ -65,6 +65,8 @@
     dataCount: $("#dataCount"),
     dataPath: $("#dataPath"),
     dataUpdated: $("#dataUpdated"),
+    dataBlurb: $("#dataBlurb"),
+    dbChipLabel: $("#dbChipLabel"),
     dbState: $("#dbState"),
     dbDetail: $("#dbDetail"),
     statusDot: $("#statusDot"),
@@ -274,8 +276,21 @@
     }, 3800);
   }
 
+  /* Local and cloud builds both call /api?route=…  — Vercel maps that to a
+     single serverless function, and server.py understands the same form. */
+  function apiURL(path) {
+    const url = new URL(path, window.location.origin);
+    if (url.pathname === "/api" || url.pathname === "/api/") {
+      return url.pathname + url.search;
+    }
+    const route = url.pathname.replace(/^\/api\/?/, "");
+    const params = new URLSearchParams(url.search);
+    params.set("route", route);
+    return `/api?${params.toString()}`;
+  }
+
   async function api(path, options = {}) {
-    const response = await fetch(path, {
+    const response = await fetch(apiURL(path), {
       headers: { "Content-Type": "application/json" },
       ...options,
     });
@@ -444,13 +459,17 @@
     els.dataCount.textContent = `${meta.total} sale${meta.total === 1 ? "" : "s"}`;
     els.dataPath.textContent = meta.db_path || "sales.db";
     els.dataUpdated.textContent = timeAgo(meta.updated_at);
+    els.dataBlurb.textContent = meta.cloud
+      ? "A hosted Postgres database, available wherever you sign in."
+      : "A single SQLite file on this computer.";
+    els.dbChipLabel.textContent = meta.cloud ? "Cloud" : "Local";
     els.sampleBtn.disabled = meta.total > 0;
     els.sampleBtn.title = meta.total > 0
       ? "Sample data can only be loaded when the database is empty."
       : "Load 320 realistic demo sales to explore the dashboard.";
     $("#clearAllBtn").disabled = meta.total === 0;
     els.dbState.textContent = "Connected";
-    els.dbDetail.textContent = `${meta.total} sale${meta.total === 1 ? "" : "s"} stored locally`;
+    els.dbDetail.textContent = `${meta.total} sale${meta.total === 1 ? "" : "s"} stored ${meta.cloud ? "in the cloud" : "locally"}`;
     els.statusDot.classList.remove("is-error");
 
     renderDemoBanner();
@@ -1341,7 +1360,7 @@
   function exportCSV() {
     const params = filterParams(true);
     const query = params.toString();
-    window.location.href = `/api/export.csv${query ? `?${query}` : ""}`;
+    window.location.href = apiURL(`/api/export.csv${query ? `?${query}` : ""}`);
   }
 
   /* ------------------------------------------------------------ navigation */
