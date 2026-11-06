@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101312">
+  <title>Counter — Sales dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23c8f45c'/%3E%3Cpath d='M20 42V32M32 42V22M44 42V27' stroke='%23101312' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="sprite" aria-hidden="true">
+    <symbol id="i-overview" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2-3 2V4a1 1 0 0 1 1-1Z"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m13.5 6.5 3 3"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></symbol>
+    <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3"/><path d="M4.5 5.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/><path d="M4.5 11.5v6c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-6"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></symbol>
+    <symbol id="i-upload-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/><path d="M12 11v6"/><path d="m9.5 14 2.5-3 2.5 3"/></symbol>
+  </svg>
+
+  <div class="loading-bar" id="loadingBar" aria-hidden="true"></div>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M6 16V11M12 16V7M18 16V9"/></svg>
+        </span>
+        <span class="brand-name">counter<span class="brand-dot">.</span></span>
+      </div>
+
+      <nav class="nav" aria-label="Sections">
+        <button class="nav-item is-active" data-view="overview" type="button">
+          <svg><use href="#i-overview"/></svg><span>Overview</span>
+        </button>
+        <button class="nav-item" data-view="transactions" type="button">
+          <svg><use href="#i-receipt"/></svg><span>Transactions</span>
+        </button>
+        <button class="nav-item" data-view="import" type="button">
+          <svg><use href="#i-import"/></svg><span>Import &amp; data</span>
+        </button>
+      </nav>
+
+      <div class="side-section">
+        <p class="side-label">Time period</p>
+        <div class="preset-list" id="presetList">
+          <button type="button" data-preset="7d">Last 7 days</button>
+          <button type="button" data-preset="30d" class="is-active">Last 30 days</button>
+          <button type="button" data-preset="90d">Last 90 days</button>
+          <button type="button" data-preset="ytd">Year to date</button>
+          <button type="button" data-preset="all">All time</button>
+        </div>
+        <div class="date-range">
+          <label>From<input type="date" id="startDate"></label>
+          <label>To<input type="date" id="endDate"></label>
+        </div>
+      </div>
+
+      <div class="side-section side-section--filters">
+        <p class="side-label">Channel</p>
+        <div class="select-wrap">
+          <select id="channelFilter" class="side-select">
+            <option value="">All channels</option>
+          </select>
+          <svg><use href="#i-chevron-right"/></svg>
+        </div>
+        <div class="currency-setting">
+          <p class="side-label">Display currency</p>
+          <div class="select-wrap">
+            <select id="currency" class="side-select">
+              <option value="USD">USD — US dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — Pound sterling</option>
+              <option value="CAD">CAD — Canadian dollar</option>
+              <option value="AUD">AUD — Australian dollar</option>
+              <option value="NGN">NGN — Nigerian naira</option>
+              <option value="INR">INR — Indian rupee</option>
+              <option value="JPY">JPY — Japanese yen</option>
+              <option value="CHF">CHF — Swiss franc</option>
+              <option value="ZAR">ZAR — South African rand</option>
+            </select>
+            <svg><use href="#i-chevron-right"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-foot">
+        <div class="side-status">
+          <span class="status-dot" id="statusDot"></span>
+          <div>
+            <strong id="dbState">Connecting…</strong>
+            <span id="dbDetail">local SQLite database</span>
+          </div>
+        </div>
+        <p class="side-hint">Everything stays on this computer.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-heading">
+          <p class="eyebrow" id="viewEyebrow">Dashboard</p>
+          <h1 id="viewTitle">Sales overview</h1>
+          <p class="subtitle" id="viewSubtitle">Loading your numbers…</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn ghost" id="exportBtn" type="button">
+            <svg><use href="#i-download"/></svg><span>Export CSV</span>
+          </button>
+          <button class="btn primary" id="addBtn" type="button">
+            <svg><use href="#i-plus"/></svg><span>New sale</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="banner hidden" id="demoBanner">
+        <span class="banner-icon"><svg><use href="#i-sparkle"/></svg></span>
+        <p><strong>Sample data is loaded.</strong> Explore the dashboard, then clear it when you're ready to track your own sales.</p>
+        <div class="banner-actions">
+          <button class="link-btn" id="bannerClear" type="button">Clear sample data</button>
+          <button class="icon-btn" id="bannerDismiss" type="button" aria-label="Dismiss"><svg><use href="#i-close"/></svg></button>
+        </div>
+      </div>
+
+      <!-- OVERVIEW -->
+      <section class="view" id="view-overview" aria-labelledby="viewTitle">
+        <div class="card empty-state hidden" id="emptyState">
+          <div class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+          </div>
+          <h2 id="emptyTitle">No sales yet</h2>
+          <p id="emptyText">Add your first sale, import a CSV, or load sample data to see how Counter works.</p>
+          <div class="empty-actions">
+            <button class="btn primary" id="emptyAdd" type="button"><svg><use href="#i-plus"/></svg>Add a sale</button>
+            <button class="btn ghost" id="emptySample" type="button">Load sample data</button>
+          </div>
+        </div>
+
+        <div id="overviewContent">
+          <div class="kpi-grid" id="kpiGrid"></div>
+
+          <div class="chart-grid">
+            <article class="card chart-card">
+              <div class="card-head">
+                <div>
+                  <h2>Revenue</h2>
+                  <p id="chartCaption">Daily revenue for the selected period</p>
+                </div>
+                <span class="range-badge" id="rangeBadge">—</span>
+              </div>
+              <div class="chart-wrap" id="revenueChart">
+                <div class="chart-tip" id="chartTip" aria-hidden="true"></div>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>By category</h2>
+                  <p>Share of revenue</p>
+                </div>
+              </div>
+              <div class="donut-layout">
+                <div class="donut" id="donutChart"></div>
+                <div class="legend" id="donutLegend"></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="lower-grid">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Top products</h2>
+                  <p>Best sellers by revenue</p>
+                </div>
+                <button class="link-btn" data-goto="transactions" type="button">View all <svg><use href="#i-arrow-right"/></svg></button>
+              </div>
+              <div class="product-list" id="topProducts"></div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Recent sales</h2>
+                  <p>Latest transactions</p>
+                </div>
+                <button class="link-btn" data-goto="transactions" type="button">View all <svg><use href="#i-arrow-right"/></svg></button>
+              </div>
+              <div class="recent-list" id="recentSales"></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="view hidden" id="view-transactions" aria-labelledby="viewTitle">
+        <article class="card table-card">
+          <div class="table-toolbar">
+            <label class="search-box">
+              <svg><use href="#i-search"/></svg>
+              <input id="searchInput" type="search" placeholder="Search product, customer, note…" autocomplete="off">
+            </label>
+            <div class="select-wrap select-wrap--light">
+              <select id="categoryFilter">
+                <option value="">All categories</option>
+              </select>
+              <svg><use href="#i-chevron-right"/></svg>
+            </div>
+            <span class="result-count" id="resultCount">—</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="sales-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Product</th>
+                  <th>Channel</th>
+                  <th class="num">Units</th>
+                  <th class="num">Unit price</th>
+                  <th class="num">Total</th>
+                  <th class="actions-col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="salesBody"></tbody>
+            </table>
+            <div class="table-empty hidden" id="tableEmpty">
+              <p>No sales match these filters.</p>
+              <button class="link-btn" id="tableClearFilters" type="button">Clear filters</button>
+            </div>
+          </div>
+
+          <div class="table-foot">
+            <span id="pageInfo">—</span>
+            <div class="pager">
+              <button class="icon-btn" id="prevPage" type="button" aria-label="Previous page"><svg><use href="#i-chevron-left"/></svg></button>
+              <span id="pageLabel">1</span>
+              <button class="icon-btn" id="nextPage" type="button" aria-label="Next page"><svg><use href="#i-chevron-right"/></svg></button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- IMPORT & DATA -->
+      <section class="view hidden" id="view-import" aria-labelledby="viewTitle">
+        <div class="import-grid">
+          <article class="card">
+            <div class="card-head">
+              <div>
+                <h2>Import sales from CSV</h2>
+                <p>Bring in an export from your shop, spreadsheet, or POS.</p>
+              </div>
+            </div>
+
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a CSV file">
+              <span class="drop-icon"><svg><use href="#i-upload-file"/></svg></span>
+              <p><strong>Drop a CSV here</strong><span class="drop-or">or</span><button class="link-btn" id="browseBtn" type="button">browse files</button></p>
+              <p class="hint">One row per sale. Required: <code>date</code> and <code>product</code>.</p>
+              <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+            </div>
+
+            <div class="import-preview hidden" id="importPreview">
+              <div class="preview-head">
+                <strong id="previewTitle">Ready to import</strong>
+                <button class="link-btn" id="cancelImport" type="button">Cancel</button>
+              </div>
+              <div class="preview-table-wrap">
+                <table class="mini-table" id="previewTable"></table>
+              </div>
+              <div class="import-actions">
+                <span id="previewNote"></span>
+                <button class="btn primary" id="confirmImport" type="button">Import rows</button>
+              </div>
+            </div>
+
+            <div class="import-result hidden" id="importResult"></div>
+
+            <div class="template-row">
+              <button class="btn ghost" id="templateBtn" type="button"><svg><use href="#i-download"/></svg>CSV template</button>
+              <span class="hint">Columns: date, product, category, channel, units, unit_price, customer, notes</span>
+            </div>
+          </article>
+
+          <div class="stack">
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Your data</h2>
+                  <p>A single SQLite file on this computer.</p>
+                </div>
+                <span class="db-chip"><svg><use href="#i-database"/></svg>Local</span>
+              </div>
+              <dl class="data-list">
+                <div><dt>Sales recorded</dt><dd id="dataCount">—</dd></div>
+                <div><dt>Database file</dt><dd id="dataPath" class="mono">—</dd></div>
+                <div><dt>Last activity</dt><dd id="dataUpdated">—</dd></div>
+              </dl>
+              <div class="data-actions">
+                <button class="btn ghost" id="sampleBtn" type="button">Load sample data</button>
+                <button class="btn danger-ghost" id="clearAllBtn" type="button">Delete all sales</button>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <div>
+                  <h2>Good to know</h2>
+                  <p>Counter is intentionally simple.</p>
+                </div>
+              </div>
+              <ul class="tips">
+                <li><span class="tip-check"><svg><use href="#i-check"/></svg></span>Every sale is saved the moment you add it.</li>
+                <li><span class="tip-check"><svg><use href="#i-check"/></svg></span>Dates use your computer's local time zone.</li>
+                <li><span class="tip-check"><svg><use href="#i-check"/></svg></span>Revenue is calculated as units × unit price.</li>
+                <li><span class="tip-check"><svg><use href="#i-check"/></svg></span>Back up <code>sales.db</code> to keep your records safe.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-foot">
+        <span>Counter · local sales dashboard</span>
+        <span id="footRange">—</span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- SALE MODAL -->
+  <div class="modal-backdrop hidden" id="saleModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="saleModalTitle">
+      <form id="saleForm" novalidate>
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow" id="saleModalEyebrow">New transaction</p>
+            <h2 id="saleModalTitle">Add a sale</h2>
+          </div>
+          <button class="icon-btn" id="closeSaleModal" type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field-row">
+            <label class="field">
+              <span>Date <em>*</em></span>
+              <input type="date" id="saleDate" required>
+            </label>
+            <label class="field">
+              <span>Channel</span>
+              <input type="text" id="saleChannel" list="channelOptions" placeholder="Online" autocomplete="off">
+              <datalist id="channelOptions"></datalist>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Product <em>*</em></span>
+            <input type="text" id="saleProduct" list="productOptions" placeholder="e.g. Aurora Wireless Earbuds" required autocomplete="off">
+            <datalist id="productOptions"></datalist>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Category</span>
+              <input type="text" id="saleCategory" list="categoryOptions" placeholder="General" autocomplete="off">
+              <datalist id="categoryOptions"></datalist>
+            </label>
+            <label class="field">
+              <span>Customer</span>
+              <input type="text" id="saleCustomer" placeholder="Optional" autocomplete="off">
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Units <em>*</em></span>
+              <input type="number" id="saleUnits" min="1" step="1" value="1" required inputmode="numeric">
+            </label>
+            <label class="field">
+              <span>Unit price <em>*</em></span>
+              <div class="price-input">
+                <span id="priceSymbol">$</span>
+                <input type="number" id="salePrice" min="0" step="0.01" value="0.00" required inputmode="decimal">
+              </div>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Notes</span>
+            <textarea id="saleNotes" rows="2" placeholder="Optional details, order number, etc."></textarea>
+          </label>
+
+          <div class="total-preview">
+            <span>Sale total</span>
+            <strong id="saleTotalPreview">$0.00</strong>
+          </div>
+          <p class="form-error hidden" id="saleError"></p>
+        </div>
+
+        <div class="modal-foot">
+          <button class="btn ghost" id="cancelSale" type="button">Cancel</button>
+          <button class="btn primary" id="saveSale" type="submit">Save sale</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-backdrop hidden" id="confirmModal">
+    <div class="modal modal--small" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">Please confirm</p>
+          <h2 id="confirmTitle">Are you sure?</h2>
+        </div>
+        <button class="icon-btn" id="confirmClose" type="button" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-text" id="confirmMessage"></p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost" id="confirmCancel" type="button">Cancel</button>
+        <button class="btn danger" id="confirmOk" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
